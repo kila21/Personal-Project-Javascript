@@ -30,6 +30,7 @@ class Transaction {
         try {
           await value.call(this.store);
           log.storeAfter = this.store;
+          this.logs.push(JSON.parse(JSON.stringify(log)));
         } catch (err) {
           //   console.log(err.name);
           if (typeof value.restore !== "undefined") {
@@ -38,20 +39,46 @@ class Transaction {
               log.error.name = err.name;
               log.error.message = err.message;
               await value.restore(this.store);
-              log.error.info = "restored without error";
+              log.error.info = "This step have no restor error";
               log.storeAfter = value.restore(this.store);
+              this.logs.push(JSON.parse(JSON.stringify(log)));
             } catch (resError) {
               log.error = {};
               log.error.name = resError.name;
               log.error.message = resError.message;
-              log.error.info = "Restored with error";
+              log.error.info = "This step have restor error.";
               delete log.storeBefore;
+              this.logs.push(JSON.parse(JSON.stringify(log)));
+              console.log(this.logs);
+              // rollback
+              let reversLogsNum = this.logs.length - 2;
+              for (reversLogsNum; reversLogsNum >= 0; reversLogsNum--) {
+                // console.log(this.logs[reversLogsNum].error);
+                let index = this.logs[reversLogsNum].index;
+                for (let i of this.scenario) {
+                  if (i.index === index) {
+                    if (this.logs[reversLogsNum].error === null) {
+                      //   console.log(i.index);
+                      try {
+                        await i.restore(this.store);
+                        this.logs[reversLogsNum].error =
+                          "firstly call succesfull, than restored";
+                      } catch (e) {
+                        this.logs[reversLogsNum].error =
+                          "firstly call succesfull, than restored Error";
+                      }
+                    }
+                  }
+                }
+                console.log(this.logs[reversLogsNum]);
+              }
+              break;
             }
           }
         }
-        this.logs.push(JSON.parse(JSON.stringify(log)));
+        // this.logs.push(JSON.parse(JSON.stringify(log)));
       }
-      console.log(this.logs);
+      //   console.log(this.logs);
     })();
   }
 }
@@ -71,11 +98,46 @@ const scenario = [
     },
     // callback for rollback
     restore: async (store) => {
-      //   throw new Error("restore error");
+      //   throw new Error("restore1 error");
+      return store;
     },
   },
   {
-    index: 2,
+    index: 30,
+    meta: {
+      title: "Delete customer",
+      description: "This action is responsible for deleting customer",
+    },
+    // callback for main execution
+    call: async (store) => {
+      //   throw new TypeError("some errror");
+      return store;
+    },
+    // callback for rollback
+    restore: async (store) => {
+      //   return store;
+      throw new Error("restore2 error");
+    },
+  },
+
+  {
+    index: 25,
+    meta: {
+      title: "Delete customer",
+      description: "This action is responsible for deleting customer",
+    },
+    // callback for main execution
+    call: async (store) => {
+      throw new TypeError("some errror");
+    },
+    // callback for rollback
+    restore: async (store) => {
+      return store;
+      //   throw new Error("restore2 error");
+    },
+  },
+  {
+    index: 35,
     meta: {
       title: "Delete customer",
       description: "This action is responsible for deleting customer",
@@ -87,7 +149,7 @@ const scenario = [
     // callback for rollback
     restore: async (store) => {
       //   return store;
-      throw new Error("restore2");
+      throw new Error("restore2 error");
     },
   },
 ];
