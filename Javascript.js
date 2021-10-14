@@ -66,6 +66,11 @@ class Transaction {
                       } catch (e) {
                         this.logs[reversLogsNum].error =
                           "firstly call succesfull, than restored Error";
+                        // throw new Error("restore failed");
+
+                        throw new Error(
+                          `Restore failed : ${e.message} with index ${i.index}`
+                        );
                       }
                     }
                   }
@@ -110,8 +115,8 @@ const scenario = [
     },
     // callback for main execution
     call: async (store) => {
-      //   throw new TypeError("some errror");
-      return store;
+      throw new TypeError("some errror");
+      //   return store;
     },
     // callback for rollback
     restore: async (store) => {
@@ -134,22 +139,6 @@ const scenario = [
     restore: async (store) => {
       return store;
       //   throw new Error("restore2 error");
-    },
-  },
-  {
-    index: 35,
-    meta: {
-      title: "Delete customer",
-      description: "This action is responsible for deleting customer",
-    },
-    // callback for main execution
-    call: async (store) => {
-      throw new TypeError("some errror");
-    },
-    // callback for rollback
-    restore: async (store) => {
-      //   return store;
-      throw new Error("restore2 error");
     },
   },
 ];
