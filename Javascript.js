@@ -77,6 +77,7 @@ class Transaction {
                 }
                 console.log(this.logs[reversLogsNum]);
               }
+              this.store = null;
               break;
             }
           }
