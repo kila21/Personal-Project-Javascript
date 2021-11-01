@@ -19,5 +19,6 @@ export interface logs extends Omit<validation, "call"> {
 }
 
 
-
-
+export interface dispatch<T> {
+  dispatch(scenario: T): Promise<T>;
+}

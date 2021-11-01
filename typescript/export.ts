@@ -1,15 +1,15 @@
-import {validation,logs} from "./import";
+import {validation, logs, dispatch} from "./import";
 
-class Transaction {
+class Transaction implements dispatch<any>{
   scenario: Array<validation>;
   store: object = {};
   logs: Array<logs>;
   constructor() {
-  this.store = {};
-  this.logs = [];
+    this.store = {};
+    this.logs = [];
   };
 
-  dispatch(scenario:Array<any>): void {
+  dispatch(scenario:any): any {
     this.scenario = scenario.sort((a, b) => a.index - b.index);
     (async () => {
       for (const scene of scenario) {
