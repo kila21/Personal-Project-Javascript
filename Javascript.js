@@ -49,7 +49,7 @@ class Transaction {
               log.error.info = "This step have restor error.";
               delete log.storeBefore;
               this.logs.push(JSON.parse(JSON.stringify(log)));
-              console.log(this.logs);
+              // console.log(this.logs);
               // rollback
               let reversLogsNum = this.logs.length - 2;
               for (reversLogsNum; reversLogsNum >= 0; reversLogsNum--) {
@@ -99,7 +99,7 @@ const scenario = [
     },
     // callback for main execution
     call: async (store) => {
-      //   throw new Error("some erro");
+      //   throw new Error("some error");
       return store;
     },
     // callback for rollback
